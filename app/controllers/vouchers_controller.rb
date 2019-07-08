@@ -13,6 +13,21 @@ class VouchersController < ApplicationController
   def show
   end
 
+  def scanqr
+  end
+
+  def checkqr
+    decoded = params[:decoded_qr]
+    if voucher = Voucher.find_by(key_qrcode: decoded)
+      voucher.update(status: "Used")
+      render js: "window.location = #{voucher_path(voucher).to_json}"
+      flash[:notice] = "Congratulations, the voucher of #{voucher.key_qrcode} is valid 🎉"
+    else
+      render js: "window.location = #{scanqr_path.to_json}"
+      flash[:alert] = "Unfortunately, this voucher is not valid"
+    end
+  end
+
   # GET /vouchers/new
   def new
     @voucher = Voucher.new
